@@ -13,7 +13,7 @@
 import {action} from '@storybook/addon-actions';
 import Bell from '@spectrum-icons/workflow/Bell';
 import {Button} from '../';
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {storiesOf} from '@storybook/react';
 import {Text} from '@react-spectrum/text';
 
@@ -58,11 +58,7 @@ storiesOf('Button', module)
   )
   .add(
     'variant: overBackground',
-    () => (
-      <div style={{backgroundColor: 'rgb(15, 121, 125)', color: 'rgb(15, 121, 125)', padding: '15px 20px', display: 'inline-block'}}>
-        {render({variant: 'overBackground'})}
-      </div>
-    )
+    () => render({variant: 'overBackground'})
   )
   .add(
     'variant: primary',
@@ -83,11 +79,47 @@ storiesOf('Button', module)
   .add(
     'element: a, href: \'//example.com\', target: \'_self\'',
     () => render({elementType: 'a', href: '//example.com', target: '_self', variant: 'primary'})
+  )
+  .add(
+    'is pending',
+    () => {
+      let timeout = useRef<ReturnType<typeof setTimeout>>();
+      let [isPending, setPending] = useState(false);
+      let handlePress = (e) => {
+        setPending(true);
+        action('press')(e);
+
+        timeout.current = setTimeout(() => {
+          setPending(false);
+        }, 3000);
+      };
+
+      useEffect(() => () => clearTimeout(timeout.current), []);
+
+      let variants = ['cta', 'primary', 'secondary', 'negative', 'overBackground'];
+
+      return (
+        <div>
+          {variants.map(variant =>
+            render({
+              onPress: handlePress,
+              variant,
+              isPending,
+            })
+          )}
+        </div>
+      )
+    }
   );
 
 function render(props: any = {}) {
+  let style = {
+    ...props.variant === 'overBackground' && {backgroundColor: 'rgb(15, 121, 125)'},
+    ...props.variant === 'overBackground' && {color: 'rgb(15, 121, 125)'},
+    padding: '15px 20px',
+  };
   return (
-    <div>
+    <div style={style}>
       <Button
         onPress={action('press')}
         onPressStart={action('pressstart')}
