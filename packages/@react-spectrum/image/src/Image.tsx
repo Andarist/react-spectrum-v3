@@ -43,10 +43,7 @@ function Image(props: SpectrumImageProps, ref: DOMRef<HTMLDivElement>) {
       {...filterDOMProps(props)}
       {...styleProps}
       className={classNames({}, styleProps.className)}
-      style={{
-        ...styleProps.style,
-        overflow: 'hidden'
-      }}
+      style={{overflow: 'hidden'}}
       ref={domRef}>
       <img
         src={src}
